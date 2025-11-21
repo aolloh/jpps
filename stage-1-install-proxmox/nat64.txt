@@ -1,0 +1,26 @@
+apt-get install tayga
+---
+### /etc/tayga.conf
+tun-device nat64
+ipv4-addr 192.168.255.1
+ipv6-addr 2a01:4f9:4b:aaaa::64
+prefix 64:ff9b::/96
+dynamic-pool 192.168.255.0/24
+data-dir /var/spool/tayga
+---
+ip link set nat64 up
+# is that one necessary? TBD
+ip addr add 2a01:4f9:4b:162c::64/128 dev nat64
+ip ro add 192.168.255.0/24 dev nat64
+ip ro add 64:ff9b::/96 dev nat64
+iptables -t nat -A POSTROUTING -s 192.168.255.0/24 -o eth0 -j MASQUERADE
+---
+Note: using the well-known prefix (64:ff9b::/96) will work if the machine
+running tayga is on the routing path for the hosts that need NAT64 (e.g.,
+when running tayga on a Proxmox hypervisor to provide NAT64 to VMs running
+on that host). However, to provide NAT64 to other hosts, I think it's
+necessary to use a subnet routed to the host; so in the example above,
+that could be 2a01:4f9:4b:aaaa:64::/96, for instance. This would then
+require a custom DNS64 service, too.
+
+

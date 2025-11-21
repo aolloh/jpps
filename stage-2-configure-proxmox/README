@@ -1,0 +1,9 @@
+On the first node:
+
+pvecm create hpx
+
+On the other nodes:
+
+pvecm add <address-of-first-node>
+
+(You will need the root password of the 1st node.)

@@ -1,0 +1,61 @@
+mv --backup=numbered /etc/network/interfaces /root/interfaces.old
+cat >/etc/network/interfaces <<EOF
+auto lo
+iface lo inet loopback
+source /etc/network/interfaces.d/*
+EOF
+
+cat >/etc/network/interfaces.d/eth0-ipv6 <<EOF
+auto eth0
+iface eth0 inet6 auto
+  address $IPV6PREFIX::3/128
+  gateway fe80::1
+EOF
+
+cat >/etc/network/interfaces.d/vmbr0 <<EOF
+auto vmbr0
+iface vmbr0 inet6 static
+  bridge-ports none
+  bridge-stp off
+  bridge-fd 0
+  address $IPV6PREFIX::4/64
+iface vmbr0 inet static
+  address $IPV4PRIVATE.1/24
+EOF
+
+cat >/etc/network/interfaces.d/vmbr1 <<EOF
+auto vmbr1
+iface vmbr1 inet6 auto
+  bridge-ports eth0.4004
+  bridge-stp off
+  bridge-fd 0
+EOF
+
+if [ "$IPV4ADDR" ]; then
+cat >/etc/network/interfaces.d/eth0-ipv4 <<EOF
+iface eth0 inet static
+        address $IPV4ADDR
+        gateway $IPV4GATEWAY
+        up iptables -t nat -A POSTROUTING -s $IPV4PRIVATE.0/24 -o eth0 -j MASQUERADE
+EOF
+fi
+
+ifreload -a
+
+cat >/etc/dnsmasq.d/vmbr0 <<EOF
+interface=vmbr0
+dhcp-range=$IPV4PRIVATE.2,$IPV4PRIVATE.254,255.255.255.0,1h
+dhcp-range=$IPV6PREFIX::,ra-only
+dhcp-option=option6:dns-server,[$IPV6PREFIX::4]
+# If you prefer to use Hetzner's DNS servers, uncomment this line.
+# (And comment out the previous one.)
+#dhcp-option=option6:dns-server,[2a01:4ff:ff00::add:1]
+EOF
+systemctl restart dnsmasq
+
+cat >/etc/sysctl.d/forwarding.conf <<EOF
+net.ipv4.ip_forward=1
+net.ipv6.conf.all.forwarding=1
+EOF
+sysctl --system
+

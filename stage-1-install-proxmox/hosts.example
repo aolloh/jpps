@@ -1,0 +1,4 @@
+# NODENAME  IPV6PREFIX        IPV4PRIVATE   IPV4ADDR          IPV4GATEWAY
+hpx01       2a01:4f9:4b:aaaa  10.10.1       135.181.1.101/26  135.181.1.65
+hpx02       2a01:4f9:4b:bbbb  10.10.2       135.181.2.15/26  135.181.2.1
+hpx03       2a01:4f9:3a:cccc  10.10.3       65.21.3.101/26   65.21.2.65

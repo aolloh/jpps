@@ -1,0 +1,6 @@
+sed -i s,https://enterprise,http://download, /etc/apt/sources.list.d/pve-enterprise.sources
+sed -i s/pve-enterprise/pve-no-subscription/ /etc/apt/sources.list.d/pve-enterprise.sources
+sed -i s,https://enterprise,http://download, /etc/apt/sources.list.d/ceph.sources
+sed -i s/enterprise/no-subscription/ /etc/apt/sources.list.d/ceph.sources
+apt-get update -q
+apt-get install -qy vim dnsmasq guestfs-tools sysstat prometheus-node-exporter

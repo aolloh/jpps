@@ -1,0 +1,30 @@
+cat >answers.toml <<'TOML'
+[global]
+keyboard = "en-us"
+country = "fr"
+fqdn = "$NODENAME.example.com"
+mailto = "someone@example.com"
+timezone = "Europe/Paris"
+root-password-hashed = "$y$j9T$u/5rvaMp..."
+root-ssh-keys = [
+    "ssh-rsa AAAAB3NzaC1..."
+]
+reboot-mode = "power-off"
+
+[network]
+#source = "from-dhcp"
+source = "from-answer"
+cidr = "$IPV6PREFIX::3/128"
+gateway = "fe80::1"
+dns = "2a01:4ff:ff00::add:1"
+# This should match any network card
+filter.SUBSYSTEM = "net" 
+
+[disk-setup]
+filesystem = "zfs"
+zfs.raid = "raid0"
+zfs.ashift = 12
+#disk-list = ["nvme0n1", "nvme1n1"]
+# This should select all disks
+filter.SUBSYSTEM = "block"
+TOML
